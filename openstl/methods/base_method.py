@@ -1,13 +1,13 @@
 import numpy as np
 import torch.nn as nn
 import os.path as osp
-import lightning as l
+import pytorch_lightning as pl
 from openstl.utils import print_log, check_dir
-from openstl.core import get_optim_scheduler, timm_schedulers
+from openstl.core import get_optim_scheduler
 from openstl.core import metric
 
 
-class Base_method(l.LightningModule):
+class Base_method(pl.LightningModule):
 
     def __init__(self, **args):
         super().__init__()
@@ -40,15 +40,6 @@ class Base_method(l.LightningModule):
                 "interval": "epoch" if by_epoch else "step"
             },
         }
-    
-    def lr_scheduler_step(self, scheduler, metric):
-        if any(isinstance(scheduler, sch) for sch in timm_schedulers):
-            scheduler.step(epoch=self.current_epoch)
-        else:
-            if metric is None:
-                scheduler.step()
-            else:
-                scheduler.step(metric)
 
     def forward(self, batch):
         NotImplementedError

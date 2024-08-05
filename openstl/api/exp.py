@@ -11,14 +11,15 @@ from openstl.methods import method_maps
 from openstl.datasets import BaseDataModule
 from openstl.utils import (get_dataset, measure_throughput, SetupCallback, EpochEndCallback, BestCheckpointCallback)
 
-from lightning import seed_everything, Trainer
-import lightning.pytorch.callbacks as lc
+import argparse
+from pytorch_lightning import seed_everything, Trainer
+import pytorch_lightning.callbacks as plc
 
 
 class BaseExperiment(object):
     """The basic class of PyTorch training and evaluation."""
 
-    def __init__(self, args, dataloaders=None, strategy='auto'):
+    def __init__(self, args, dataloaders=None, strategy='ddp'):
         """Initialize experiments (non-dist as an example)"""
         self.args = args
         self.config = self.args.__dict__
@@ -76,7 +77,7 @@ class BaseExperiment(object):
 
         callbacks = [setup_callback, ckpt_callback, epochend_callback]
         if args.sched:
-            callbacks.append(lc.LearningRateMonitor(logging_interval=None))
+            callbacks.append(plc.LearningRateMonitor(logging_interval=None))
         return callbacks, save_dir
 
     def _get_data(self, dataloaders=None):
@@ -91,7 +92,7 @@ class BaseExperiment(object):
         return BaseDataModule(train_loader, vali_loader, test_loader)
 
     def train(self):
-        self.trainer.fit(self.method, self.data, ckpt_path=self.args.ckpt_path if self.args.ckpt_path else None)
+        self.trainer.fit(self.method, self.data)
 
     def test(self):
         if self.args.test == True:
