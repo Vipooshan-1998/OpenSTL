@@ -4,6 +4,7 @@ import sys
 import time
 import os.path as osp
 from fvcore.nn import FlopCountAnalysis, flop_count_table
+import logging
 
 import torch
 
@@ -95,7 +96,7 @@ class BaseExperiment(object):
         self.trainer.fit(self.method, self.data)
 
     def test(self):
-        print(self.save_dir)
+        logging.info(self.save_dir)
         if self.args.test == True:
             ckpt = torch.load(osp.join(self.save_dir, 'checkpoints', 'best.ckpt'))
             self.method.load_state_dict(ckpt['state_dict'])
