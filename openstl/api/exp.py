@@ -96,6 +96,8 @@ class BaseExperiment(object):
         self.trainer.fit(self.method, self.data)
 
     def test(self):
+        print('<<--->>')
+        print(self.save_dir)
         logging.info(self.save_dir)
         if self.args.test == True:
             ckpt = torch.load(osp.join(self.save_dir, 'checkpoints', 'best.ckpt'))
